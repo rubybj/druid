@@ -35,7 +35,7 @@ import java.util.Map;
  */
 public class TopNResultValue implements Iterable<DimensionAndMetricValueExtractor>
 {
-  private final List<DimensionAndMetricValueExtractor> value;
+  private List<DimensionAndMetricValueExtractor> value;
 
   @JsonCreator
   public TopNResultValue(List<?> value)
@@ -69,6 +69,11 @@ public class TopNResultValue implements Iterable<DimensionAndMetricValueExtracto
   public Iterator<DimensionAndMetricValueExtractor> iterator()
   {
     return value.iterator();
+  }
+
+  public void setValue(List<DimensionAndMetricValueExtractor> v)
+  {
+    value = v;
   }
 
   @Override

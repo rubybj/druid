@@ -46,6 +46,8 @@ import org.apache.druid.query.QueryInterruptedException;
 import org.apache.druid.query.QueryToolChest;
 import org.apache.druid.query.context.ResponseContext;
 import org.apache.druid.server.metrics.QueryCountStatsProvider;
+import org.apache.druid.server.resulthandle.DruidResultSecondDevHandler;
+import org.apache.druid.server.resulthandle.tool.QueryContextKeys;
 import org.apache.druid.server.security.Access;
 import org.apache.druid.server.security.AuthConfig;
 import org.apache.druid.server.security.AuthorizationUtils;
@@ -70,8 +72,7 @@ import javax.ws.rs.core.StreamingOutput;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 @LazySingleton
@@ -107,6 +108,7 @@ public class QueryResource implements QueryCountStatsProvider
   private final AtomicLong successfulQueryCount = new AtomicLong();
   private final AtomicLong failedQueryCount = new AtomicLong();
   private final AtomicLong interruptedQueryCount = new AtomicLong();
+
 
   @Inject
   public QueryResource(
@@ -184,8 +186,33 @@ public class QueryResource implements QueryCountStatsProvider
     try {
       queryLifecycle.initialize(readQuery(req, in, ioReaderWriter));
       query = queryLifecycle.getQuery();
-      final String queryId = query.getId();
+      /**
+       * 按原代码，把数据移动过来。
+       */
+      String queryId = query.getId();
 
+      String type=query.getType();
+      String resultType=(String)query.getContextValue("result_type");
+      LinkedHashMap resultModel=(LinkedHashMap)query.getContextValue("result_model");
+      if(resultType!=null){
+        query.getContext().remove("result_type");
+      }
+      if(resultModel!=null){
+        query.getContext().remove("result_model");
+      }
+
+      if (queryId == null) {
+        queryId = UUID.randomUUID().toString();
+        query = query.withId(queryId);
+      }
+      if (query.getContextValue(QueryContextKeys.TIMEOUT) == null) {
+        query = query.withOverriddenContext(
+                ImmutableMap.of(
+                        QueryContextKeys.TIMEOUT,
+                        30000
+                )
+        );
+      }
       final String queryThreadName = StringUtils.format(
           "%s[%s_%s_%s]",
           currThreadName,
@@ -216,8 +243,12 @@ public class QueryResource implements QueryCountStatsProvider
         return Response.notModified().build();
       }
 
-      final Yielder<?> yielder = Yielders.each(results);
-
+      Yielder<?> yielder = Yielders.each(results);
+      long beginTime=System.currentTimeMillis();
+      yielder= DruidResultSecondDevHandler.secondDevResultHandler(yielder,resultType,type,resultModel);
+      long endTime=System.currentTimeMillis();
+      log.info("结果集处理耗时======="+(endTime-beginTime));
+      final Yielder yielderResult=yielder;
       try {
         boolean shouldFinalize = QueryContexts.isFinalize(query, true);
         boolean serializeDateTimeAsLong =
@@ -242,7 +273,7 @@ public class QueryResource implements QueryCountStatsProvider
                     CountingOutputStream os = new CountingOutputStream(outputStream);
                     try {
                       // json serializer will always close the yielder
-                      jsonWriter.writeValue(os, yielder);
+                      jsonWriter.writeValue(os,yielderResult);
 
                       os.flush(); // Some types of OutputStream suppress flush errors in the .close() method.
                       os.close();

@@ -201,11 +201,25 @@ public class ForkingTaskRunner
 
                         Iterables.addAll(command, new QuotableWhiteSpaceSplitter(config.getJavaOpts()));
                         Iterables.addAll(command, config.getJavaOptsArray());
-
+                        // Override task specific javaOpts
+                        //Different tasks need different resources. According to the task needs, configure the JVM settings.
+                        Object taskJavaOpts = task.getContextValue(
+                                ForkingTaskRunnerConfig.JAVA_OPTS_PROPERTY + "." + task.getDataSource()
+                        );
+                        if(taskJavaOpts == null){
+                          taskJavaOpts = task.getContextValue(
+                                  ForkingTaskRunnerConfig.JAVA_OPTS_PROPERTY
+                          );
+                          LOGGER.info("use default javaOpts"+ForkingTaskRunnerConfig.JAVA_OPTS_PROPERTY);
+                        }else{
+                          LOGGER.info("use datasource specific javaOpts"+ForkingTaskRunnerConfig.JAVA_OPTS_PROPERTY + "." + task.getDataSource());
+                        }
+                        /**
                         // Override task specific javaOpts
                         Object taskJavaOpts = task.getContextValue(
                             ForkingTaskRunnerConfig.JAVA_OPTS_PROPERTY
                         );
+                         **/
                         if (taskJavaOpts != null) {
                           Iterables.addAll(
                               command,

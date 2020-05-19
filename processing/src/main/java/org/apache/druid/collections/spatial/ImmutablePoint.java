@@ -23,7 +23,8 @@ import org.apache.druid.collections.bitmap.BitmapFactory;
 
 import java.nio.ByteBuffer;
 
-public class ImmutablePoint extends ImmutableNode
+public class
+ImmutablePoint extends ImmutableNode
 {
   public ImmutablePoint(
       int numDims,
