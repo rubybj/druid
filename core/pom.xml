@@ -331,6 +331,24 @@
       <groupId>com.google.errorprone</groupId>
       <artifactId>error_prone_annotations</artifactId>
     </dependency>
+      <dependency>
+          <groupId>com.yahoo.datasketches</groupId>
+          <artifactId>sketches-core</artifactId>
+          <version>0.13.4</version>
+          <scope>compile</scope>
+      </dependency>
+    <dependency>
+      <groupId>com.yahoo.datasketches</groupId>
+      <artifactId>sketches-core</artifactId>
+      <version>0.13.4</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.yahoo.datasketches</groupId>
+      <artifactId>sketches-core</artifactId>
+      <version>0.13.4</version>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
 
   <build>
