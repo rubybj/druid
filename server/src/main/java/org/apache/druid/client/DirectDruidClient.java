@@ -34,6 +34,7 @@ import org.apache.druid.java.util.common.guava.BaseSequence;
 import org.apache.druid.java.util.common.guava.CloseQuietly;
 import org.apache.druid.java.util.common.guava.Sequence;
 import org.apache.druid.java.util.common.guava.Sequences;
+import org.apache.druid.java.util.common.logger.LogTrace;
 import org.apache.druid.java.util.common.logger.Logger;
 import org.apache.druid.java.util.emitter.service.ServiceEmitter;
 import org.apache.druid.java.util.http.client.HttpClient;
@@ -203,6 +204,7 @@ public class DirectDruidClient<T> implements QueryRunner<T>
 
         private InputStream dequeue() throws InterruptedException
         {
+          LogTrace.getInstance().writeCosttime(DirectDruidClient.class,url+"start");
           final InputStreamHolder holder = queue.poll(checkQueryTimeout(), TimeUnit.MILLISECONDS);
           if (holder == null) {
             throw new RE("Query[%s] url[%s] timed out.", query.getId(), url);
@@ -214,7 +216,7 @@ public class DirectDruidClient<T> implements QueryRunner<T>
                                                  .resume(holder.getChunkNum());
             channelSuspendedTime.addAndGet(backPressureTime);
           }
-
+          LogTrace.getInstance().writeCosttime(DirectDruidClient.class,url+"end"+currentQueuedByteCount);
           return holder.getStream();
         }
 

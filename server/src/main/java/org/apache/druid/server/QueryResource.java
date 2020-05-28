@@ -38,6 +38,7 @@ import org.apache.druid.java.util.common.StringUtils;
 import org.apache.druid.java.util.common.guava.Sequence;
 import org.apache.druid.java.util.common.guava.Yielder;
 import org.apache.druid.java.util.common.guava.Yielders;
+import org.apache.druid.java.util.common.logger.LogTrace;
 import org.apache.druid.java.util.emitter.EmittingLogger;
 import org.apache.druid.query.GenericQueryMetricsFactory;
 import org.apache.druid.query.Query;
@@ -171,8 +172,10 @@ public class QueryResource implements QueryCountStatsProvider
       @Context final HttpServletRequest req
   ) throws IOException
   {
+
     final QueryLifecycle queryLifecycle = queryLifecycleFactory.factorize();
     Query<?> query = null;
+    LogTrace.getInstance().initTheardLog();
 
     String acceptHeader = req.getHeader("Accept");
     if (Strings.isNullOrEmpty(acceptHeader)) {
@@ -191,27 +194,36 @@ public class QueryResource implements QueryCountStatsProvider
        */
       String queryId = query.getId();
 
-      String type=query.getType();
-      String resultType=(String)query.getContextValue("result_type");
-      LinkedHashMap resultModel=(LinkedHashMap)query.getContextValue("result_model");
-      if(resultType!=null){
-        query.getContext().remove("result_type");
-      }
-      if(resultModel!=null){
-        query.getContext().remove("result_model");
+      String type = query.getType();
+
+      String resultType=null;
+      LinkedHashMap resultModel=null;
+
+
+      if(!type.equals("postresult")) {
+        resultType = (String) query.getContextValue("result_type");
+        resultModel = (LinkedHashMap) query.getContextValue("result_model");
+        if (resultType != null) {
+          query.getContext().remove("result_type");
+
+        }
+        if (resultModel != null) {
+          query.getContext().remove("result_model");
+        }
       }
 
       if (queryId == null) {
         queryId = UUID.randomUUID().toString();
         query = query.withId(queryId);
       }
-      if (query.getContextValue(QueryContextKeys.TIMEOUT) == null) {
-        query = query.withOverriddenContext(
-                ImmutableMap.of(
-                        QueryContextKeys.TIMEOUT,
-                        30000
-                )
-        );
+      if (query.getContextValue(
+
+
+              QueryContextKeys.TIMEOUT) == null) {
+      //   query.getContext().put(
+        //                QueryContextKeys.TIMEOUT,
+          //              30000
+       // );
       }
       final String queryThreadName = StringUtils.format(
           "%s[%s_%s_%s]",
@@ -233,6 +245,7 @@ public class QueryResource implements QueryCountStatsProvider
       }
 
       final QueryLifecycle.QueryResponse queryResponse = queryLifecycle.execute();
+
       final Sequence<?> results = queryResponse.getResults();
       final ResponseContext responseContext = queryResponse.getResponseContext();
       final String prevEtag = getPreviousEtag(req);
@@ -243,9 +256,14 @@ public class QueryResource implements QueryCountStatsProvider
         return Response.notModified().build();
       }
 
+      LogTrace.getInstance().writeCosttime(QueryResource.class,"获取数据前");
       Yielder<?> yielder = Yielders.each(results);
+
       long beginTime=System.currentTimeMillis();
-      yielder= DruidResultSecondDevHandler.secondDevResultHandler(yielder,resultType,type,resultModel);
+      if(!type.equals("postresult")){
+
+        yielder= DruidResultSecondDevHandler.secondDevResultHandler(yielder,resultType,type,resultModel);
+      }
       long endTime=System.currentTimeMillis();
       log.info("结果集处理耗时======="+(endTime-beginTime));
       final Yielder yielderResult=yielder;

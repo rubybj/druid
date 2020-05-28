@@ -22,6 +22,7 @@ package org.apache.druid.java.util.common.guava;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import org.apache.druid.java.util.common.RE;
+import org.apache.druid.java.util.common.logger.LogTrace;
 import org.apache.druid.java.util.common.logger.Logger;
 import org.apache.druid.utils.JvmUtils;
 
@@ -184,7 +185,9 @@ public class ParallelMergeCombiningSequence<T> extends YieldingSequenceBase<T>
                 try {
                   if (currentBatch == null || currentBatch.isDrained()) {
                     if (hasTimeout) {
+                      LogTrace.getInstance().writeCosttime(ParallelMergeCombiningSequence.class,"cost start");
                       currentBatch = queue.poll(thisTimeoutNanos, TimeUnit.NANOSECONDS);
+                      LogTrace.getInstance().writeCosttime(ParallelMergeCombiningSequence.class,"cost end");
                     } else {
                       currentBatch = queue.take();
                     }
