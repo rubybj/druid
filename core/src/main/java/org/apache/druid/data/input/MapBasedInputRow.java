@@ -22,6 +22,7 @@ package org.apache.druid.data.input;
 import org.apache.commons.io.IOUtils;
 import org.apache.druid.guice.annotations.PublicApi;
 import org.apache.druid.java.util.common.DateTimes;
+import org.apache.druid.java.util.common.StringUtils;
 import org.apache.druid.java.util.common.logger.Logger;
 import org.joda.time.DateTime;
 
@@ -247,9 +248,10 @@ public class MapBasedInputRow extends MapBasedRow implements InputRow
     String bv = (String) event.get("bv");
     if (bv != null && !"".equals(bv)){
       if (bv.contains("IE")){
-        event.put("bv",bv.replace("IE","Internet Explorer"));
-      }else if (bv.toLowerCase().contains("internet") && !bv.toLowerCase().contains("explorer")){
-        event.put("bv",bv.replace("Internet","Internet Explorer"));
+
+        event.put("bv",StringUtils.replace(bv,"IE","Internet Explorer"));
+      }else if (StringUtils.toLowerCase(bv).contains("internet") && !StringUtils.toLowerCase(bv).contains("explorer")){
+        event.put("bv",StringUtils.replace(bv,"IE","Internet Explorer"));
       }
     }
 
@@ -259,13 +261,13 @@ public class MapBasedInputRow extends MapBasedRow implements InputRow
     String screenSize = (String) event.get("screen_size");
     if (screenSize != null && !"".equals(screenSize)){
       if (screenSize.contains("*")){
-        String as = screenSize.replaceAll(" ","");
+        String as = StringUtils.replace(screenSize," ","");
         event.put("screen_size",as);
       }else if (screenSize.contains("×")){
-        String as = screenSize.replaceAll("×","*");
+        String as = StringUtils.replace(screenSize,"×","*");
         event.put("screen_size",as);
       }else if(screenSize.contains("���")){
-        String as = screenSize.replaceAll("���","*");
+        String as = StringUtils.replace(screenSize,"���","*");
         event.put("screen_size",as);
       }
 //            if (screenSize.contains("*")){
@@ -309,7 +311,7 @@ public class MapBasedInputRow extends MapBasedRow implements InputRow
       }else if (osType.contains("iOS 12") || osType.contains("ios 12")){
         event.put("os_type","iOS 12");
       }else{
-        event.put("os_type",osType.toUpperCase().split("\\.")[0]);
+        event.put("os_type",StringUtils.toLowerCase(osType).split("\\.")[0]);
       }
     }else if(osType.contains("android")){
       if (osType.contains("android 5")){
@@ -327,7 +329,7 @@ public class MapBasedInputRow extends MapBasedRow implements InputRow
       }else if (osType.contains("android 9")){
         event.put("os_type","Android 9.x");
       }else{
-        event.put("os_type",osType.replaceAll("android","Android").split("\\.")[0]);
+        event.put("os_type",StringUtils.replace(osType,"android","Android").split("\\.")[0]);
       }
     }else if(osType.contains("Android")){
       if (osType.contains("Android 5")){

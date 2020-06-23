@@ -32,10 +32,12 @@ public class Quantile {
         if(list.size()==1){
             return list.get(0);
         }else{
-            double index=1+(list.size()-1)*quantile;
+            double index=list.size()*(1-quantile);
             int low=(int)index;
-            double mid=index-low;
-            return list.get(low)*mid+(1-mid)*list.get(low-1);
+           // if(low>list.size())
+           // double mid=index-low;
+            return list.get(low);
+           // return list.get(low)*mid+(1-mid)*list.get(low-1);
         }
 
     }
@@ -45,6 +47,7 @@ public class Quantile {
         if(list.size()==1){
             return list.get(0);
         }else{
+
             Double U=list.get(list.size()-2);
             Double L=list.get(list.size()-1);
             //return Arith.add(Arith.mul(Arith.sub(U,L),Arith.sub(loc,loc.intValue())),L);

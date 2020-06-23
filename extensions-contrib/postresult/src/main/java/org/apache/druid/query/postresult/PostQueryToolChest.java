@@ -20,6 +20,7 @@
 package org.apache.druid.query.postresult;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -88,6 +89,14 @@ public class PostQueryToolChest extends QueryToolChest
   {
     Query realQuery = getRealQuery(query);
     return warehouse.getToolChest(realQuery).makeMetrics(realQuery);
+  }
+
+  @Override
+  public ObjectMapper decorateObjectMapper(final ObjectMapper objectMapper, final  Query query){
+
+    final Query realQuery = getRealQuery(query);
+    return warehouse.getToolChest(realQuery).decorateObjectMapper(objectMapper,realQuery);
+
   }
 
   /**

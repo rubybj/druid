@@ -37,10 +37,10 @@ import org.apache.druid.query.resulthandle.metricsstrategy.ContextStrategy;
 import org.apache.druid.query.resulthandle.metricsstrategy.DistributionStrategy;
 import org.apache.druid.query.resulthandle.metricsstrategy.IMetricsStrategy;
 import org.apache.druid.query.resulthandle.tool.Buckets;
+import org.apache.druid.query.resulthandle.tool.Quantile;
 import org.apache.druid.query.resulthandle.tool.ResultConst;
 import org.apache.druid.query.topn.DimensionAndMetricValueExtractor;
 import org.apache.druid.query.topn.TopNResultValue;
-import org.apache.druid.server.resulthandle.tool.Quantile;
 import org.eclipse.jetty.util.StringUtil;
 
 import java.lang.reflect.Array;

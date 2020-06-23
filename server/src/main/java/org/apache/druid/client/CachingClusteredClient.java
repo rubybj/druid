@@ -512,7 +512,7 @@ public class CachingClusteredClient implements QuerySegmentWalker
         byte[] queryCacheKey
     )
     {
-      // cacheKeys map must preserve segment ordering, in order for shards to always be combined in the same order
+      // cacheKeys map must preserve se`gment ordering, in order for shards to always be combined in the same order
       Map<SegmentServerSelector, Cache.NamedKey> cacheKeys = Maps.newLinkedHashMap();
       for (SegmentServerSelector segmentServer : segments) {
         final Cache.NamedKey segmentCacheKey = CacheUtil.computeSegmentCacheKey(
@@ -712,7 +712,7 @@ public class CachingClusteredClient implements QuerySegmentWalker
             }
             return res.map(
                 toolChest.makePreComputeManipulatorFn(downstreamQuery, MetricManipulatorFns.deserializing())::apply
-            );
+                    resultsOfSegment            );
           })
           .flatMerge(seq -> seq, query.getResultOrdering());
     }

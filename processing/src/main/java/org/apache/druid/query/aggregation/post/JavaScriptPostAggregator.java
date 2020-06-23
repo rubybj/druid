@@ -24,6 +24,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
+import com.yahoo.sketches.theta.*;
+import org.apache.druid.java.util.common.parsers.ParseException;
 import org.apache.druid.js.JavaScriptConfig;
 import org.apache.druid.query.aggregation.AggregatorFactory;
 import org.apache.druid.query.aggregation.DoubleSumAggregator;
@@ -69,6 +71,14 @@ public class JavaScriptPostAggregator implements PostAggregator
         Context cx = Context.getCurrentContext();
         if (cx == null) {
           cx = contextFactory.enterContext();
+        }
+        try {
+          for(int i=0;i<args.length;i++){
+            args[i]=PostAgg4Sketch.getInstance().getValue(args[i]);
+          }
+
+        }catch (Exception e){
+          throw new ParseException("JavaScriptPostAggregator error Sketch 类型转换出错");
         }
 
         return Context.toNumber(fn.call(cx, scope, scope, args));
