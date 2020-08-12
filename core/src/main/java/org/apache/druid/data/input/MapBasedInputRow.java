@@ -89,11 +89,17 @@ public class MapBasedInputRow extends MapBasedRow implements InputRow
   private void initMap(){
     if (map.isEmpty()){
       InputStream ips = MapBasedInputRow.class.getClassLoader().getResourceAsStream("data.txt");
+      if (ips == null) {
+        return ;
+      }
       List<String> lines = null;
       try {
         lines = IOUtils.readLines(ips);
-      } catch (IOException e) {
-        log.error("读取文件出错:"+e.getMessage());
+      } catch (Exception e) {
+        log.error(e.getMessage()+"读取文件出错:");
+      }
+      if(lines==null) {
+        return ;
       }
       for (String line : lines){
         String[] ls = line.split(",");
@@ -108,6 +114,8 @@ public class MapBasedInputRow extends MapBasedRow implements InputRow
   private void dealField() {
     initMap();
     Map<String, Object> event = getEvent();
+   //上线后太多报错
+    /*
     browserType(event);
     screenSize(event);
     osType(event);
@@ -122,6 +130,8 @@ public class MapBasedInputRow extends MapBasedRow implements InputRow
     //unique_tid 处理
     uniqueTid(event);
     terminalType(event);
+
+    */
     setEvent(event);
   }
 
@@ -266,8 +276,8 @@ public class MapBasedInputRow extends MapBasedRow implements InputRow
       }else if (screenSize.contains("×")){
         String as = StringUtils.replace(screenSize,"×","*");
         event.put("screen_size",as);
-      }else if(screenSize.contains("���")){
-        String as = StringUtils.replace(screenSize,"���","*");
+      }else if(screenSize.contains("weizhi")){
+        String as = StringUtils.replace(screenSize,"weizhi","*");
         event.put("screen_size",as);
       }
 //            if (screenSize.contains("*")){

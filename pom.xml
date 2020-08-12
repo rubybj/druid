@@ -103,7 +103,7 @@
         <protobuf.version>3.11.0</protobuf.version>
         <slf4j.version>1.7.12</slf4j.version>
         <!-- If compiling with different hadoop version also modify default hadoop coordinates in TaskConfig.java -->
-        <hadoop.compile.version>2.8.5</hadoop.compile.version>
+        <hadoop.compile.version>3.0.0</hadoop.compile.version>
         <powermock.version>2.0.2</powermock.version>
         <aws.sdk.version>1.11.199</aws.sdk.version>
         <caffeine.version>2.8.0</caffeine.version>
@@ -128,6 +128,7 @@
         <module>server</module>
         <module>sql</module>
         <module>services</module>
+        <module>extensions-contrib/postresult</module>
         <module>integration-tests</module>
         <module>benchmarks</module>
         <module>extendedset</module>
@@ -199,6 +200,17 @@
           <id>sigar</id>
           <url>https://repository.jboss.org/nexus/content/repositories/thirdparty-uploads/</url>
         </repository>
+            <repository>
+                <id>cloudera</id>
+                <url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
+                <releases>
+                    <enabled>true</enabled>
+                </releases>
+                <snapshots>
+                    <enabled>false</enabled>
+                </snapshots>
+            </repository>
+
     </repositories>
 
     <dependencyManagement>
@@ -1327,6 +1339,7 @@
                     <excludeRoots>
                         <excludeRoot>target/generated-sources/</excludeRoot>
                     </excludeRoots>
+                    <skip>true</skip><!-- 添加skip属性，并赋值true -->
                 </configuration>
                 <executions>
                     <execution>
@@ -1512,7 +1525,7 @@
                                 <projectName>Apache Druid</projectName>
                             </properties>
                             <resourceBundles>
-                                <resourceBundle>org.apache.apache.resources:apache-jar-resource-bundle:1.5-SNAPSHOT</resourceBundle>
+                                <resourceBundle>org.apache.apache.resources:apache-jar-resource-bundle:1.4</resourceBundle>
                             </resourceBundles>
                         </configuration>
                     </execution>

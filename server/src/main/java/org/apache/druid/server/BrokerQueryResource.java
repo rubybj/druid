@@ -55,8 +55,8 @@ public class BrokerQueryResource extends QueryResource
 
   @Inject
   public BrokerQueryResource(
-      QueryLifecycleFactory queryLifecycleFactory,
       @Json ObjectMapper jsonMapper,
+      QueryLifecycleFactory queryLifecycleFactory,
       @Smile ObjectMapper smileMapper,
       QueryScheduler queryScheduler,
       AuthConfig authConfig,

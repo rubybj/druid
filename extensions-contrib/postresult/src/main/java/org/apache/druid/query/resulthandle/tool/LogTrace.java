@@ -26,7 +26,10 @@ public class LogTrace {
         logMap.put(name,System.currentTimeMillis());
     }
     public void writeCosttime(Class classes,String str){
-        Log.info("Calss"+classes.getName()+str+"cost:"+(System.currentTimeMillis()-logMap.get(Thread.currentThread().getName())));
+        if((System.currentTimeMillis()-logMap.get(Thread.currentThread().getName()))>10000){
+            Log.info("Class"+classes.getName()+str+"cost:"+(System.currentTimeMillis()-logMap.get(Thread.currentThread().getName())));
+        }
+
     }
 
 

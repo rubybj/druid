@@ -25,7 +25,10 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Binder;
 import org.apache.druid.guice.DruidBinders;
+import org.apache.druid.guice.LifecycleModule;
 import org.apache.druid.initialization.DruidModule;
+import org.apache.druid.query.MapQueryToolChestWarehouse;
+import org.apache.druid.query.QueryToolChestWarehouse;
 
 import java.util.List;
 
@@ -44,10 +47,11 @@ public class PostQueryDruidModule implements DruidModule
   @Override
   public void configure(Binder binder) 
   {
+    binder.bind(QueryToolChestWarehouse.class).to(MapQueryToolChestWarehouse.class);
     DruidBinders.queryToolChestBinder(binder)
         .addBinding(PostResultQuery.class)
         .to(PostQueryToolChest.class);
-   // LifecycleModule.register(binder, DerivativeDataSourceManager.class);
+    //LifecycleModule.register(binder, DerivativeDataSourceManager.class);
    // binder.bind(DataSourceOptimizer.class).in(Singleton.class);
     //MetricsModule.register(binder, DataSourceOptimizerMonitor.class);
    // JsonConfigProvider.bind(binder, "druid.manager.derivatives", MaterializedViewConfig.class);

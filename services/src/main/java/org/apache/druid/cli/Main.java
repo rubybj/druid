@@ -49,6 +49,11 @@ public class Main
   @SuppressForbidden(reason = "System#out")
   public static void main(String[] args)
   {
+    try{
+      Thread.sleep(10000);
+    }catch (Exception e){
+
+    }
     final Cli.CliBuilder<Runnable> builder = Cli.builder("druid");
 
     builder.withDescription("Druid command-line runner.")
